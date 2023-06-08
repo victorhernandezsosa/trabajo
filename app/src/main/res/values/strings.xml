@@ -3,4 +3,5 @@
     <string name="btnmostrar">Mostrar Datos</string>
     <string name="title_activity_crear">ActivityCrear</string>
     <string name="btninsertar">Agregar</string>
+    <string name="btnfoto">Tomar Foto</string>
 </resources>
