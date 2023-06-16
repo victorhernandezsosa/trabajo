@@ -10,7 +10,6 @@ import androidx.core.content.FileProvider;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -30,9 +29,8 @@ public class ActivityFoto extends AppCompatActivity {
     static final int peticion_captura_imagen = 101;
     static final int peticion_acceso_camara = 102;
 
-    static final int REQUEST_TAKE_PHOTO = 1;
-
     String currentPhotoPath;
+
     ImageView Objetoimagen;
     Button btntomarfoto;
     String pathfoto;
@@ -47,18 +45,17 @@ public class ActivityFoto extends AppCompatActivity {
 
         btntomarfoto.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 permisos();
             }
         });
-
     }
 
     private void permisos()
     {
         if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
         {
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CAMERA},peticion_acceso_camara);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},peticion_acceso_camara);
         }
         else
         {
@@ -71,25 +68,28 @@ public class ActivityFoto extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == peticion_acceso_camara)
+        if(requestCode == peticion_acceso_camara )
         {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED )
             {
-                TomarFoto();
+                dispatchTakePictureIntent();
+                //TomarFoto();
+            }
+            else
+            {
+                Toast.makeText(getApplicationContext(), "Se necesita el permiso para accder a la camara", Toast.LENGTH_LONG).show();
             }
         }
-        else
-        {
-            Toast.makeText(getApplicationContext(), "Se necesita el permiso para acceder a la camara", Toast.LENGTH_LONG).show();
-        }
+
     }
 
     private void TomarFoto()
     {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (intent.resolveActivity(getPackageManager()) != null)
+
+        if(intent.resolveActivity(getPackageManager())!= null)
         {
-            startActivityForResult(intent, peticion_captura_imagen);
+            startActivityForResult(intent, peticion_captura_imagen );
         }
     }
 
@@ -97,13 +97,24 @@ public class ActivityFoto extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == peticion_captura_imagen)
+        if(requestCode  == peticion_captura_imagen)
         {
+            /*
             Bundle extras = data.getExtras();
             Bitmap imagen = (Bitmap) extras.get("data");
             Objetoimagen.setImageBitmap(imagen);
-        }
+             */
 
+            try {
+                File foto = new File(currentPhotoPath);
+                Objetoimagen.setImageURI(Uri.fromFile(foto));
+            }
+            catch (Exception ex)
+            {
+                ex.toString();
+            }
+
+        }
     }
 
     private File createImageFile() throws IOException {
@@ -121,6 +132,7 @@ public class ActivityFoto extends AppCompatActivity {
         currentPhotoPath = image.getAbsolutePath();
         return image;
     }
+
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -144,5 +156,4 @@ public class ActivityFoto extends AppCompatActivity {
             }
         }
     }
-
 }
